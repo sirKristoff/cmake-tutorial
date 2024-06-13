@@ -6,13 +6,20 @@
 *.lo
 *.o
 *.obj
+*.elf
 
 # Precompiled Headers
 *.gch
 *.pch
 
+# Linker output
+*.ilk
+*.map
+*.exp
+
 # Compiled Dynamic libraries
 *.so
+*.so.*
 *.dylib
 *.dll
 
@@ -23,6 +30,7 @@
 # Compiled Static libraries
 *.lai
 *.la
+*.lo
 *.a
 *.lib
 
@@ -30,6 +38,15 @@
 *.exe
 *.out
 *.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
 
 # gcc coverage testing tool files
 *.gcno
