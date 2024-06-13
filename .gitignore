@@ -52,3 +52,24 @@
 *.gcno
 *.gcda
 *.gcov
+
+## CMake
+# In-source build tree
+build/
+build_debug/
+build_release/
+
+# Generated and user files
+**/CMakeCache.txt
+**/CMakeFiles
+**/CMakeLists.txt.user
+**/CMakeScripts
+**/CMakeUserPresets.json
+**/cmake_install.cmake
+**/compile_commands.json
+**/CPackConfig.cmake
+**/CTestTestfile.cmake
+**/install_manifest.txt
+Makefile
+Testing
+_deps
