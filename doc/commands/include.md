@@ -39,3 +39,17 @@ Make restriction to include file only once.
 Restriction takes effect only in the current scope. \
 `DIRECTORY` argument applies protection in within the current directory and below, \
 `GLOBAL` keyword in the whole build.
+ 
+ ## 3. Scoped subdirectories
+
+```cmake
+add_subdirectory(
+    source_dir
+    [binary_dir]
+    [EXCLUDE_FROM_ALL]
+)
+```
+
+* `source_dir`  - Path (relative to the current directory) where `CMakeLists.txt` file will be parsed in directory scope
+* `binary_dir`  - Path in which built files will be written
+* `EXCLUDE_FROM_ALL`  - Disables the default building of targets defined in the subdirectory
