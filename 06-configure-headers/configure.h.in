@@ -1,0 +1,8 @@
+#cmakedefine FOO_ENABLE
+#cmakedefine FOO_STRING1 "@FOO_STRING1@"
+/*
+  If configure_file() command has @ONLY argument
+  \${FOO_STRING2} is not replaced
+*/
+#cmakedefine FOO_STRING2 "${FOO_STRING2}"
+#cmakedefine FOO_UNDEFINED "@FOO_UNDEFINED@"
