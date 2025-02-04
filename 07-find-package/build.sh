@@ -34,9 +34,10 @@ case $1 in
 
   '')
     set -x
+    rm -rf  "${SCRIPT_DIR}/build"  # TODO: cleanup
     cmake  -S "${SCRIPT_DIR}"  \
            -B "${SCRIPT_DIR}/build"
-    cmake  --build "${SCRIPT_DIR}/build"
+    cmake  --build "${SCRIPT_DIR}/build" --verbose
     ;;
 
   -c|--configure|-g|--generate)

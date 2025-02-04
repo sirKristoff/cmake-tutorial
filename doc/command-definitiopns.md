@@ -7,7 +7,7 @@ Commonly used naming convention is `snake_case`.
 ## 1. Macros
 
 ```cmake
-macro( <name>, [<argument>...] )
+macro( <name> [<argument>...] )
   <commands>
 endmacro()
 ```
@@ -23,7 +23,7 @@ After macro declaration, it may be **executed** by calling its name (function ca
 ## 2. Functions
 
 ```cmake
-function( <name>, [<argument-name>...] )
+function( <name> [<argument-name>...] )
   <commands>
 endfunction()
 ```

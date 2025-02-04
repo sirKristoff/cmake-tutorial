@@ -73,3 +73,7 @@ build_release/
 Makefile
 Testing
 _deps
+
+
+## VS Code
+.vscode/
