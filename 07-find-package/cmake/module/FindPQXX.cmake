@@ -25,36 +25,76 @@ In scope of this file folowing variables will be set by CMake:
 #]]
 
 
-function(add_imported_library  library  headers)
+macro(message_not_quietly text)
   if(NOT ${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY)
-    message(STATUS "add_library(PQXX::PQXX)")
+    message(AUTHOR_WARNING ${text})
   endif()
+endmacro()
+
+
+if (NOT (PostgreSQL_LIBRARIES AND PostgreSQL_INCLUDE_DIR) )
+  include(CMakeFindDependencyMacro)
+  #[[
+  Find the library and headers of the nested dependency - PostgreSQL.
+
+  find_dependency() macro call return() if the dependency is not found!
+  REQUIRED and QUIET flags are forwarded to nested search.
+  POSTGRES_LIBRARIES and POSTGRES_INCLUDE_DIRECTORIES are macro output what is specific for PostgreSQL.
+  #]]
+  find_dependency(PostgreSQL)
+endif()
+
+message_not_quietly("add_library(PQXX::PostgreSQL)")
+add_library(PQXX::PostgreSQL
+  UNKNOWN  # allows the path to an imported library
+          # to be used without having to know what type of library it is.
+  IMPORTED   # References a library file located outside the project.
+)
+message_not_quietly("set_target_properties(PQXX::PostgreSQL IMPORTED_LOCATION ${PostgreSQL_LIBRARIES})")  # TODO: cleanup
+set_target_properties(PQXX::PostgreSQL
+  PROPERTIES
+    IMPORTED_LOCATION  ${PostgreSQL_LIBRARIES}    # specifies the location of the main library file on disk
+)
+message_not_quietly("target_include_directories(PQXX::PostgreSQL ${PostgreSQL_INCLUDE_DIR})")  # TODO: cleanup
+target_include_directories(PQXX::PostgreSQL
+  INTERFACE ${PostgreSQL_INCLUDE_DIR}
+)
+
+
+
+
+function(add_imported_library  library  headers)
+  message_not_quietly("add_library(PQXX::PQXX)")
   add_library(PQXX::PQXX
     UNKNOWN  # allows the path to an imported library
-             # to be used without having to know what type of library it is.
+            # to be used without having to know what type of library it is.
     IMPORTED   # References a library file located outside the project.
   )
-  set_target_properties(PQXX::PQXX PROPERTIES
-    IMPORTED_LOCATION  ${library}    # specifies the location of the main library file on disk
-    INTERFACE_INCLUDE_DIRECTORIES  ${headers}
+  message(AUTHOR_WARNING "set_target_properties(PQXX::PQXX IMPORTED_LOCATION ${library})")  # TODO: cleanup
+  set_target_properties(PQXX::PQXX
+    PROPERTIES
+      IMPORTED_LOCATION  ${library}    # specifies the location of the main library file on disk
+      # INTERFACE_INCLUDE_DIRECTORIES  ${headers}
+  )
+  target_link_libraries(PQXX::PQXX
+    INTERFACE
+      # ${library}
+      PQXX::PostgreSQL
+  )
+  message(AUTHOR_WARNING "target_include_directories(PQXX::PQXX ${headers})")  # TODO: cleanup
+  target_include_directories(PQXX::PQXX
+    INTERFACE ${headers}
   )
   set(PQXX_FOUND  1  # it will indicate in global scope that PQXX was found
       CACHE INTERNAL "PQXX found" FORCE)
   set(PQXX_LIBRARIES  ${library}  # stores in cache to do not perform search again
-      CACHE STRING "Path to pqxx library" FORCE)
+      CACHE FILEPATH "Path to pqxx library" FORCE)
   set(PQXX_INCLUDES  ${headers}
-      CACHE STRING "Path to pqxx headers" FORCE)
+      CACHE PATH "Path to pqxx headers" FORCE)
   # advanced variables are not visible in the CMake GUI unless the "advanced" option is enabled
   mark_as_advanced(FORCE  PQXX_LIBRARIES)
   mark_as_advanced(FORCE  PQXX_INCLUDES)
 endfunction()
-
-
-set(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_arg)
-if(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED)
-  set(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_arg REQUIRED)
-endif()
-# unset(PQXX_FIND_REQUIRED_arg)
 
 
 #[[ 
@@ -64,20 +104,9 @@ use these paths and create an `IMPORTED` target.
 User may provide paths through the command line, with -D arguments.
 #]]
 if (PQXX_LIBRARIES AND PQXX_INCLUDES)
-  add_imported_library(${PQXX_LIBRARIES} ${PQXX_INCLUDES})
+  add_imported_library("${PQXX_LIBRARIES}" "${PQXX_INCLUDES}")
   return()
 endif()
-
-
-include(CMakeFindDependencyMacro)
-#[[
-Find the library and headers of the nested dependency - PostgreSQL.
-
-find_dependency() macro call return() if the dependency is not found!
-REQUIRED and QUIET flags are forwarded to nested search.
-POSTGRES_LIBRARIES and POSTGRES_INCLUDE_DIRECTORIES are macro output what is specific for PostgreSQL.
-#]]
-find_dependency(PostgreSQL)
 
 
 #[[
@@ -107,7 +136,7 @@ find_library(PQXX_LIBRARY_PATH  # if file is found, its path will be in PQXX_LIB
     /usr/local/lib
     /usr/lib
   NO_DEFAULT_PATH  # disable scanning a long list of default paths provided by CMake for host environment
-  # ${PQXX_FIND_REQUIRED_arg}  # forward REQUIRED flag - check will be done in find_package_handle_standard_args()
+  DOC "Found path to pqxx library"
 )
 
 # gets path to directory containing header file otherwise PQXX_HEADER_PATH-NOTFOUND
@@ -121,7 +150,7 @@ find_path(PQXX_HEADER_PATH  # if header(s) is found, PQXX_HEADER_PATH contains d
     /usr/local/include
     /usr/include
   NO_DEFAULT_PATH
-  # ${PQXX_FIND_REQUIRED_arg}  # forward REQUIRED flag - check will be done in find_package_handle_standard_args()
+  DOC "Found path to pqxx headers"
 )
 
 include(FindPackageHandleStandardArgs)
@@ -151,7 +180,7 @@ find_package_handle_standard_args(
 if (PQXX_FOUND)
   # Created IMPORTED target with PQXX and PortgreSQL libraries and headers
   add_imported_library(
-    "${PQXX_LIBRARY_PATH};${POSTGRES_LIBRARIES}"
-    "${PQXX_HEADER_PATH};${POSTGRES_INCLUDE_DIRECTORIES}"
+    "${PQXX_LIBRARY_PATH}"
+    "${PQXX_HEADER_PATH}"
   )
 endif()
