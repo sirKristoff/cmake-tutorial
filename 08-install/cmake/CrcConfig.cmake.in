@@ -1,0 +1,14 @@
+@PACKAGE_INIT@
+
+ ## (at)PACKAGE_LIB_INSTALL_DIR(at) is placeholder
+ ## for substitution of variable value LIB_INSTALL_DIR
+
+ ## set variable by path and check if it exists
+set_and_check(CRC_LIB_DIR "@PACKAGE_LIB_INSTALL_DIR@")
+ ##
+include("${CRC_LIB_DIR}/cmake/CrcTargets.cmake")
+
+ ## verify whether all the components in package (Crc),
+ ## which are required by the user in find_package(<package> REQUIRED <component>),
+ ## have been found
+check_required_components(Crc)
