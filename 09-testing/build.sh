@@ -24,6 +24,8 @@ Options:
         : Run tests
   --test-log
         : Print test log file
+  --cov | --coverage
+        : Measure test coverage
   --clean
         : Clean build
   --rm
@@ -46,7 +48,8 @@ case $1 in
     echo -e '\n====  --configure  ===='
     set -x
     cmake  -S "${SCRIPT_DIR}"  \
-           -B "${SCRIPT_DIR}/build"
+           -B "${SCRIPT_DIR}/build"  \
+           -D CMAKE_BUILD_TYPE=Debug
     ;;
 
   -b|--build)
@@ -74,6 +77,19 @@ case $1 in
     echo -e '\n===  --test-log  ===='
     set -x
     less "${SCRIPT_DIR}/build/test/Testing/Temporary/LastTest.log"
+    ;;
+
+  --cov|--coverage)
+    # $0 --rm
+    # $0 --configure
+    echo -e '\n===  --coverage  ===='
+    set -x
+    cmake  -D TUTORIAL_ENABLE_COVERAGE:BOOL=ON  \
+           "${SCRIPT_DIR}/build"
+    cmake    \
+           --build "${SCRIPT_DIR}/build"  \
+           --config "Debug"  \
+           --target coverage
     ;;
 
   --clean)

@@ -1,7 +1,3 @@
-if (NOT TUTORIAL_BUILD_TESTS)
-  return()
-endif()
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -11,11 +7,11 @@ enable_testing()
 include(FindGoogleTest)
 
 include(GoogleTest)
-# include(Coverage)
+include(Coverage)
 # include(Memcheck)
 
 macro(AddTests target)
-  # AddCoverage(${target})
+  AddCoverage(${target})
 
   target_link_libraries(${target}
     PRIVATE

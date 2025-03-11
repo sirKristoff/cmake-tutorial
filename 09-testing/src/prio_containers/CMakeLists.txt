@@ -18,7 +18,7 @@ set_target_properties(prio_containers_lib  PROPERTIES
   OUTPUT_NAME  "prio_containers"
 )
 
-# include(Coverage)
-# CleanCoverage(prio_containers_lib)
+include(Coverage)
+CleanCoverage(prio_containers_lib)
 # include(CppCheck)
 # AddCppCheck(prio_containers_obj)

@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.20.0)
 project(
   TestingSample
-  VERSION  0.1
+  VERSION  0.2
   LANGUAGES  CXX
 )
 
 option(TUTORIAL_BUILD_TESTS
   "Set to ON to build tests" ON)
 option(TUTORIAL_ENABLE_COVERAGE
-  "Execute code coverage" OFF)
+  "Execute code coverage" ON)
 option(TUTORIAL_DEV_WARNINGS
   "Enable more compiler warnings and warnings as errors" OFF)
 
