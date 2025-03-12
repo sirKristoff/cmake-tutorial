@@ -27,23 +27,30 @@ endif()
 ##   Compilation process will generate coverage note (.gcno) files.
 function(EnableCoverage target)
   if (NOT ${PROJECT_NAME}_ENABLE_COVERAGE)
+    # pointless to enable coverage if this option is not set
     return()
   endif()
+
+  # coverage test makes sense only in Debug builds
   if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(WARNING "Enabling coverage for not Debug build. "
             "Should configure project with flag: `-D CMAKE_BUILD_TYPE=Debug`")
   endif()
+
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
     get_target_property(library_type ${target} TYPE)
-    if (${library_type} STREQUAL "OBJECT_LIBRARY")  # TODO: change to INTERFACE_LIBRARY
+    if (${library_type} STREQUAL "INTERFACE_LIBRARY")
       # for header only library '--coverage' should be propagated
       # to target compiling test sources
-      target_compile_options(${target} PUBLIC --coverage -fno-inline)
-    else()  # STATIC_LIBRARY or SHARED_LIBRARY or OBJECT_LIBRARY
+      target_compile_options(${target} INTERFACE --coverage -fno-inline)
+    elseif (${library_type} STREQUAL "OBJECT_LIBRARY")
+      # '--coverage' compile option should be used for compiling this target's sources
       target_compile_options(${target} PRIVATE --coverage -fno-inline)
+    else()  # STATIC_LIBRARY or SHARED_LIBRARY
+      message(AUTHOR_WARNING "${library_type}")
     endif()
     # this link option has to be propagated to target linking test executable
-    target_link_options(${target} PUBLIC --coverage)
+    target_link_options(${target} INTERFACE --coverage)
   else()
     message(AUTHOR_WARNING "No known compiler/linker flags for enabling coverage,"
             " CMAKE_CXX_COMPILER_ID : '${CMAKE_CXX_COMPILER_ID}'")
@@ -56,6 +63,13 @@ function(CleanCoverage target)
   if (NOT ${PROJECT_NAME}_ENABLE_COVERAGE)
     return()
   endif()
+
+  get_target_property(library_type ${target} TYPE)
+  if (${library_type} STREQUAL "INTERFACE_LIBRARY")
+    # INTERFACE library may not have PRE_BUILD command
+    return()
+  endif()
+
   add_custom_command(
     TARGET ${target}
     PRE_BUILD COMMAND
@@ -68,6 +82,7 @@ endfunction()
 ## Add target for collecting coverage metrics and generating coverage report
 function(AddCoverage target)
   if (NOT ${PROJECT_NAME}_ENABLE_COVERAGE)
+    # pointless to gather coverage data if this option is set
     return()
   endif()
 
