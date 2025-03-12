@@ -10,8 +10,19 @@ include(GoogleTest)
 include(Coverage)
 # include(Memcheck)
 
+# add target gathering all unit tests
+if (NOT TARGET exec-utests)
+  add_custom_target(exec-utests)
+endif()
+
 macro(AddTests target)
   AddCoverage(${target})
+
+  add_custom_target(exec-${target}
+    COMMAND $<TARGET_FILE:${target}>
+    COMMENT "Executing  ${target}"
+  )
+  add_dependencies(exec-utests exec-${target})
 
   target_link_libraries(${target}
     PRIVATE

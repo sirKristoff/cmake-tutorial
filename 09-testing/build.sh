@@ -45,23 +45,27 @@ case $1 in
     ;;
 
   -c|--configure|-g|--generate)
+    shift
     echo -e '\n====  --configure  ===='
     set -x
-    cmake  -S "${SCRIPT_DIR}"  \
-           -B "${SCRIPT_DIR}/build"  \
-           -D CMAKE_BUILD_TYPE=Debug
+    cmake -S "${SCRIPT_DIR}"  \
+          -B "${SCRIPT_DIR}/build"  \
+          -D CMAKE_BUILD_TYPE=Debug  \
+          $@
     ;;
 
   -b|--build)
+    shift
     echo -e '\n===  --build  ===='
     set -x
-    cmake  --build "${SCRIPT_DIR}/build"  \
-           --config "Debug"
+    cmake --build "${SCRIPT_DIR}/build"  \
+          --config "Debug"  \
+          $@
     ;;
 
   -t|--test)
-    echo -e '\n===  --test  ===='
     shift
+    echo -e '\n===  --test  ===='
     set -x
     cd "${SCRIPT_DIR}/build/test"
         # --verbose
@@ -70,7 +74,10 @@ case $1 in
           --output-on-failure  \
           --output-log Testing/Temporary/ctest.log  \
           $@
-    # "${SCRIPT_DIR}/build/test/prio_containers/prio_containers_test"
+    # # run custom target gathering all targets executing unit tests
+    # cmake --build "${SCRIPT_DIR}/build"  \
+    #       --config "Debug"  \
+    #       --target exec-utests
     ;;
 
   --test-log)
@@ -80,16 +87,15 @@ case $1 in
     ;;
 
   --cov|--coverage)
-    # $0 --rm
-    # $0 --configure
+    shift
     echo -e '\n===  --coverage  ===='
     set -x
-    cmake  -D TUTORIAL_ENABLE_COVERAGE:BOOL=ON  \
-           "${SCRIPT_DIR}/build"
-    cmake    \
-           --build "${SCRIPT_DIR}/build"  \
-           --config "Debug"  \
-           --target coverage
+    # set cache variable
+    cmake  -D TestingSample_ENABLE_COVERAGE:BOOL=ON  \
+           "${SCRIPT_DIR}/build"  &&  \
+    cmake --build "${SCRIPT_DIR}/build"  \
+          --config "Debug"  \
+          --target coverage
     ;;
 
   --clean)
@@ -102,7 +108,7 @@ case $1 in
   --rm)
     echo -e '\n===  --rm  ===='
     set -x
-    rm -rfv "${SCRIPT_DIR}/build"
+    rm -rf "${SCRIPT_DIR}/build"
     ;;
 
   *)

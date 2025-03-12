@@ -5,12 +5,14 @@ project(
   LANGUAGES  CXX
 )
 
-option(TUTORIAL_BUILD_TESTS
+option(TestingSample_BUILD_TESTS
   "Set to ON to build tests" ON)
-option(TUTORIAL_ENABLE_COVERAGE
+option(TestingSample_ENABLE_COVERAGE
   "Execute code coverage" ON)
-option(TUTORIAL_DEV_WARNINGS
+option(TestingSample_DEV_WARNINGS
   "Enable more compiler warnings and warnings as errors" OFF)
+option(TestingSample_VERBOSE_BUILD
+  "Make build process more verbose and traceable" OFF)
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
