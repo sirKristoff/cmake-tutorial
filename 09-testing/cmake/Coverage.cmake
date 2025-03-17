@@ -47,7 +47,7 @@ function(EnableCoverage target)
       # '--coverage' compile option should be used for compiling this target's sources
       target_compile_options(${target} PRIVATE --coverage -fno-inline)
     else()  # STATIC_LIBRARY or SHARED_LIBRARY
-      message(AUTHOR_WARNING "${library_type}")
+      message(AUTHOR_WARNING "Coverage should be enabled for OBJECT or INTERFACE library")
     endif()
     # this link option has to be propagated to target linking test executable
     target_link_options(${target} INTERFACE --coverage)
@@ -92,8 +92,8 @@ function(AddCoverage target)
     # Run the ${target} executable (unit tests).
     # TARGET_FILE generator will implicitly add a dependency on ${target}
     #  causing it to be build before executing command.
-    COMMAND $<TARGET_FILE:${target}>
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND $<TARGET_FILE:${target}> || (exit 0)
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
     COMMENT "Running ${target} to generate coverage data (.gcda)."
   )
   add_dependencies(coverage coverage-${target})

@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -26,7 +26,7 @@ macro(AddTests target)
 
   target_link_libraries(${target}
     PRIVATE
-      GTest::gtest_main
+      GTest::gmock_main
   )
 
   # Disable unity build for tests. There are several files defining the same
